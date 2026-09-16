@@ -3,20 +3,16 @@ import Intro from '@/sections/Intro'
 import Quiz from '@/sections/Quiz'
 import Result from '@/sections/Result'
 import Leaderboard from '@/sections/Leaderboard'
-import Groups from '@/sections/Groups'
-import Admin from '@/sections/Admin'
 import { computeResult, type TestResult } from '@/lib/sbti'
 import { pushCloudRecord } from '@/lib/cloud'
 import { useRecords } from '@/lib/useRecords'
 
-type Tab = 'test' | 'board' | 'groups' | 'admin'
+type Tab = 'test' | 'board'
 type Stage = 'intro' | 'quiz' | 'result'
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'test', label: '开始测试' },
   { key: 'board', label: '排行榜' },
-  { key: 'groups', label: '团建分组' },
-  { key: 'admin', label: '管理' },
 ]
 
 export default function Home() {
@@ -116,8 +112,6 @@ export default function Home() {
             onClearLocal={clearLocal}
           />
         )}
-        {tab === 'groups' && <Groups records={records} />}
-        {tab === 'admin' && <Admin records={records} offline={offline} loading={loading} refresh={refresh} />}
       </main>
 
       <footer className="border-t-2 border-black/10 py-6 text-center text-xs text-neutral-400">

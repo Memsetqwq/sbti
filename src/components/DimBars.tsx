@@ -7,9 +7,9 @@ const LEVEL_COLOR: Record<Level, string> = {
   H: 'bg-rose-500',
 }
 
-export default function DimBars({ vector }: { vector: Level[] }) {
+export default function DimBars({ vector, compact = false }: { vector: Level[]; compact?: boolean }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+    <div className={`grid gap-3 ${compact ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-5'}`}>
       {DIMENSION_GROUPS.map(g => (
         <div key={g.label} className="rounded-xl border-2 border-black bg-white p-3 shadow-[3px_3px_0_#000]">
           <div className="mb-2 text-center text-sm font-black">{g.label}</div>

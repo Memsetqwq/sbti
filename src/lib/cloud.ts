@@ -8,7 +8,8 @@
 
 export const PANTRY_ID = '260fb1d6-acbc-4eac-a7e2-8afbf242eebd'
 
-/** 管理口令（写死在前端，仅供团建现场防手滑，非安全边界） */
+/** 组织者账号与口令（写死在前端，仅供团建现场防手滑，非安全边界） */
+export const ADMIN_USER = 'admin'
 export const ADMIN_PASSWORD = 'sbti-admin'
 
 const BASE = `https://getpantry.cloud/apiv1/pantry/${PANTRY_ID}`
@@ -168,4 +169,33 @@ export async function clearCloudRecords(): Promise<{ ok: number; fail: number }>
   })
   invalidate()
   return { ok, fail }
+}
+
+// ─── 分组结果发布（独立 basket，覆盖写；不带 r- 前缀，不进排行榜） ────────────
+
+const GROUPS_BASKET = 'meta-groups'
+
+export interface PublishedGroups {
+  ts: number
+  groups: { name: string; code: string }[][]
+}
+
+export async function publishGroups(groups: { name: string; code: string }[][]): Promise<boolean> {
+  try {
+    const payload: PublishedGroups = { ts: Date.now(), groups }
+    await req(`/basket/${GROUPS_BASKET}`, { method: 'POST', body: JSON.stringify(payload) })
+    return true
+  } catch {
+    return false
+  }
+}
+
+export async function fetchGroups(): Promise<PublishedGroups | null> {
+  try {
+    const data = await req<PublishedGroups>(`/basket/${GROUPS_BASKET}`)
+    if (!Array.isArray(data?.groups)) return null
+    return data
+  } catch {
+    return null
+  }
 }
