@@ -1,73 +1,44 @@
-# React + TypeScript + Vite
+# SBTI 人格测试 · 团建版
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> MBTI 已经过时，SBTI 来了。
 
-Currently, two official plugins are available:
+一个用于团建活动的 SBTI 人格测试**本地镜像增强版**：完整复刻原版的恶搞测试体验，并新增了**排行榜**、**人格分类统计**、**一键按性格分组**和**管理后台**，方便组织者现场使用。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**在线体验**：https://memsetqwq.github.io/sbti/
 
-## React Compiler
+## 功能
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 📝 **完整镜像原版测试**：32 题随机排序（三选一），15 维 L/M/H 签名匹配 25+2 种人格，含隐藏人格 **DRUNK（酒鬼）** 与兜底人格 **HHHH（傻乐者）**
+- 🏆 **排行榜**：成绩存档、人格分布统计、稀有度榜（「全服仅 x 人」）
+- 🧩 **团建分组**：按五大人格分类（掌控高能 / 情感 / 抽象自嘲 / 社交面具 / 特殊）打散发牌，自动均衡分成 2–6 组
+- ☁️ **云端同步**：基于 [Pantry](https://getpantry.cloud) 免费 JSON 存储，多台手机的成绩实时汇总到同一榜单；云端不可用时自动降级为本机模式
+- 🖥️ **管理后台**：口令保护（默认 `sbti-admin`），支持记录排序、统计卡片、导出 JSON/CSV、删除/清空数据，以及适合现场投屏的自动刷新**大屏模式**
 
-## Expanding the ESLint configuration
+## 本地运行
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev        # 开发预览
+npm run build      # 构建到 dist/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 部署
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+静态站点，可直接部署到任意静态托管。本项目使用 GitHub Pages：
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build -- --base=/sbti/   # 按仓库名设置 base 路径
+npx gh-pages -d dist -b gh-pages
 ```
+
+如需独立的数据空间，替换 `src/lib/cloud.ts` 中的 `PANTRY_ID` 常量（到 getpantry.cloud 免费创建），管理口令 `ADMIN_PASSWORD` 也在同一文件中。
+
+## 来源与致谢
+
+- **原版测试**：SBTI（Silly Big Personality Test）由哔哩哔哩 UP 主 **「蛆肉儿串儿」（后改名 Q肉儿串儿）** 于 2026 年 4 月制作发布，凭借「MBTI 已经过时，SBTI 来了」的口号刷屏社交网络。原版的初衷是劝一位爱喝酒的朋友戒酒，因此设计了隐藏人格 DRUNK。
+- 本项目为**非官方的粉丝向镜像与二创**，仅供团建娱乐使用。人格类型库（25 常规 + 2 特殊）、15 维签名匹配机制均整理自原版公开资料与网友分享；题目中约 10 道为原版原题，其余为同风格补全。
+- 如原作者认为本项目不妥，请联系仓库所有者，将立即删除。
+
+## 免责声明
+
+本测试仅供娱乐，别拿它当诊断、面试、相亲、分手……或人生判决书。你可以笑，但别太当真。
