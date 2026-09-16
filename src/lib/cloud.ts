@@ -1,14 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Pantry 云端同步（https://getpantry.cloud · 免费 · 纯 REST）
 //
-// ⚠️ 重要：Pantry 不允许随意编造 ID——下面这个 PANTRY_ID 是占位符，尚未激活。
-//    请先到 https://getpantry.cloud 首页点「Create a Pantry」（需过一次人机验证，
-//    约 30 秒），拿到真实 Pantry ID 后替换此常量并重新部署。
-//    如需独立数据空间，同样换一个自己的 Pantry ID 即可，新旧数据互不可见。
-//    未替换前应用会自动进入「离线模式」（仅用本机 localStorage），功能不受影响。
+// 这是已在 getpantry.cloud 创建并激活的真实 Pantry ID（2026-09-17 接入）。
+//    如需独立数据空间，换一个自己的 Pantry ID 即可，新旧数据互不可见。
+//    云端不可用时应用会自动进入「离线模式」（仅用本机 localStorage），功能不受影响。
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const PANTRY_ID = '286068ed-9a4b-4cf5-916f-6d5eb683b849'
+export const PANTRY_ID = '260fb1d6-acbc-4eac-a7e2-8afbf242eebd'
 
 /** 管理口令（写死在前端，仅供团建现场防手滑，非安全边界） */
 export const ADMIN_PASSWORD = 'sbti-admin'
