@@ -4,14 +4,12 @@ import { loadRecords, saveRecords, PERSONALITIES, type SavedRecord } from './sbt
 
 export interface MergedRecord extends SavedRecord {
   source: 'local' | 'cloud'
-  basket?: string
 }
 
-function cloudToRecord(c: { basket: string; name: string; type: string; match: number; ts: number }): MergedRecord {
+function cloudToRecord(c: { name: string; type: string; match: number; ts: number }): MergedRecord {
   const p = PERSONALITIES.find(x => x.code === c.type)
   return {
-    id: `cloud:${c.basket}`,
-    basket: c.basket,
+    id: `cloud:${c.name}|${c.ts}`,
     nickname: c.name,
     code: c.type,
     name: p?.name ?? c.type,
@@ -57,38 +55,44 @@ export function useRecords() {
 
   useEffect(() => { void refresh() }, [refresh])
 
-  const addLocal = useCallback((r: Omit<SavedRecord, 'id' | 'ts'>) => {
-    const rec: SavedRecord = { ...r, id: crypto.randomUUID(), ts: Date.now() }
-    setLocal(prev => {
-      const next = [...prev, rec]
-      saveRecords(next)
-      return next
-    })
-    return rec
+  const persist = useCallback((next: SavedRecord[]) => {
+    saveRecords(next)
+    setLocal(next)
   }, [])
+
+  const addLocal = useCallback((r: Omit<SavedRecord, 'id' | 'ts' | 'synced'>, synced: boolean) => {
+    const rec: SavedRecord = { ...r, id: crypto.randomUUID(), ts: Date.now(), synced }
+    persist([...loadRecords(), rec])
+    return rec
+  }, [persist])
+
+  const markSynced = useCallback((ids: string[]) => {
+    const set = new Set(ids)
+    persist(loadRecords().map(r => (set.has(r.id) ? { ...r, synced: true } : r)))
+  }, [persist])
 
   const removeLocal = useCallback((id: string) => {
-    setLocal(prev => {
-      const next = prev.filter(r => r.id !== id)
-      saveRecords(next)
-      return next
-    })
-  }, [])
+    persist(loadRecords().filter(r => r.id !== id))
+  }, [persist])
 
   const clearLocal = useCallback(() => {
-    saveRecords([])
-    setLocal([])
-  }, [])
+    persist([])
+  }, [persist])
 
   const records = useMemo(() => mergeRecords(local, cloud), [local, cloud])
 
+  // 本机已保存但尚未同步云端的记录
+  const pendingLocal = useMemo(() => local.filter(r => r.synced === false), [local])
+
   return {
     records,
-    cloudRecords: cloud?.records ?? [],
+    pendingLocal,
     offline: cloud?.offline ?? false,
+    everSynced: (cloud?.fetchedAt ?? 0) > 0,
     loading,
     refresh,
     addLocal,
+    markSynced,
     removeLocal,
     clearLocal,
   }

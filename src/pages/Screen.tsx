@@ -19,7 +19,7 @@ function Clock() {
 }
 
 export default function Screen() {
-  const { records, offline, refresh } = useRecords()
+  const { records, offline, everSynced, refresh } = useRecords()
   const [groupsData, setGroupsData] = useState<PublishedGroups | null>(null)
   const seenMaxTs = useRef(0)
   const [freshSince, setFreshSince] = useState(0)
@@ -74,7 +74,7 @@ export default function Screen() {
             </h1>
             <p className="mt-2 text-lg font-bold text-amber-200/60">
               MBTI 已经过时，SBTI 来了
-              {offline && <span className="ml-3 rounded border border-amber-500/50 px-2 py-0.5 text-sm text-amber-400">📴 离线模式：仅显示本机数据</span>}
+              {offline && !everSynced && <span className="ml-3 rounded border border-amber-500/50 px-2 py-0.5 text-sm text-amber-400">📴 离线模式：仅显示本机数据</span>}
             </p>
           </div>
           <div className="flex gap-3 sm:gap-4">

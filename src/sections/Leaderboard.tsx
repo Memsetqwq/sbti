@@ -41,8 +41,12 @@ export default function Leaderboard({ records, offline, loading, onRefresh, onRe
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       {offline && (
-        <div className="rounded-xl border-2 border-black bg-neutral-200 px-4 py-2.5 text-center text-sm font-black text-neutral-600 shadow-[3px_3px_0_#000]">
-          📴 离线模式：仅显示本机数据
+        <div className="flex items-center justify-center gap-3 rounded-xl border-2 border-black bg-neutral-200 px-4 py-2.5 text-sm font-black text-neutral-600 shadow-[3px_3px_0_#000]">
+          <span>📴 离线模式：仅显示本机数据</span>
+          <button
+            onClick={onRefresh}
+            className="rounded-lg border-2 border-black bg-white px-3 py-1 text-xs font-black hover:bg-yellow-100"
+          >重试</button>
         </div>
       )}
 

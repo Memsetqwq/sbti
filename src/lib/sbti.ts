@@ -272,6 +272,7 @@ export interface SavedRecord {
   category: string
   match: number
   ts: number
+  synced?: boolean // 是否已成功同步云端；缺省视为已同步（老数据兼容）
 }
 
 const STORAGE_KEY = 'sbti-leaderboard-v1'

@@ -9,18 +9,37 @@ interface Props {
   saved: boolean
   onSave: () => Promise<'cloud' | 'local'>
   onRetake: () => void
+  pendingCount: number
+  onRetrySync: () => Promise<boolean>
 }
 
-export default function Result({ nickname, result, saved, onSave, onRetake }: Props) {
+export default function Result({ nickname, result, saved, onSave, onRetake, pendingCount, onRetrySync }: Props) {
   const p = result.personality
   const [justSaved, setJustSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [retrying, setRetrying] = useState(false)
   const [saveMsg, setSaveMsg] = useState('')
   const catColor = CATEGORY_COLOR[p.category] ?? 'bg-neutral-200'
 
   const handleSave = async () => {
-    setJustSaved(true)
-    const where = await onSave()
-    setSaveMsg(where === 'cloud' ? '☁️ 已同步到云端排行榜' : '📴 云端不可用，已保存到本机')
+    setSaving(true)
+    try {
+      const where = await onSave()
+      setJustSaved(true)
+      setSaveMsg(where === 'cloud' ? '☁️ 已同步到云端排行榜' : '⏳ 云端拥挤，已存本机，稍后可重试')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleRetry = async () => {
+    setRetrying(true)
+    try {
+      const ok = await onRetrySync()
+      setSaveMsg(ok ? '☁️ 已同步到云端排行榜' : '⏳ 云端仍然拥挤，过会儿再试')
+    } finally {
+      setRetrying(false)
+    }
   }
 
   return (
@@ -64,12 +83,21 @@ export default function Result({ nickname, result, saved, onSave, onRetake }: Pr
 
       <div className="flex flex-col sm:flex-row justify-center gap-3">
         <button
-          disabled={saved || justSaved}
+          disabled={saved || justSaved || saving}
           onClick={() => { void handleSave() }}
           className="rounded-xl border-2 border-black bg-rose-500 px-8 py-3 font-black text-white shadow-[4px_4px_0_#000] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:shadow-[1px_1px_0_#000] disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:shadow-none"
         >
-          {saved || justSaved ? '✓ 已保存到排行榜' : '保存到排行榜'}
+          {saving ? '同步中…' : saved || justSaved ? '✓ 已保存到排行榜' : '保存到排行榜'}
         </button>
+        {justSaved && pendingCount > 0 && (
+          <button
+            disabled={retrying}
+            onClick={() => { void handleRetry() }}
+            className="rounded-xl border-2 border-black bg-sky-300 px-8 py-3 font-black shadow-[4px_4px_0_#000] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:shadow-[1px_1px_0_#000] disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:shadow-none"
+          >
+            {retrying ? '重试中…' : `重试同步（${pendingCount} 条未同步）`}
+          </button>
+        )}
         <button
           onClick={onRetake}
           className="rounded-xl border-2 border-black bg-white px-8 py-3 font-black shadow-[4px_4px_0_#000] transition-transform hover:-translate-y-0.5 hover:bg-yellow-100 active:translate-y-0 active:shadow-[1px_1px_0_#000]"

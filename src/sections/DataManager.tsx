@@ -63,10 +63,10 @@ export default function DataManager({ records, refresh }: Props) {
   }
 
   const handleDelete = async (r: MergedRecord) => {
-    if (!r.basket) return
+    if (r.source !== 'cloud') return
     if (!window.confirm(`删除 ${r.nickname}（${r.code}）这条云端记录？`)) return
     setBusy(true)
-    await deleteCloudRecord(r.basket)
+    await deleteCloudRecord({ name: r.nickname, ts: r.ts })
     await refresh(true)
     setBusy(false)
   }

@@ -20,7 +20,7 @@ export default function Home() {
   const [stage, setStage] = useState<Stage>('intro')
   const [nickname, setNickname] = useState('')
   const [result, setResult] = useState<TestResult | null>(null)
-  const { records, offline, loading, refresh, addLocal, removeLocal, clearLocal } = useRecords()
+  const { records, pendingLocal, offline, loading, refresh, addLocal, markSynced, removeLocal, clearLocal } = useRecords()
 
   const startTest = (name: string) => {
     setNickname(name)
@@ -41,15 +41,28 @@ export default function Home() {
       name: result.personality.name,
       category: result.personality.category,
       match: result.match,
-    })
+    }, false)
     const ok = await pushCloudRecord({
       name: rec.nickname,
       type: rec.code,
       match: rec.match,
       ts: rec.ts,
     })
+    if (ok) markSynced([rec.id])
     void refresh(true)
     return ok ? 'cloud' : 'local'
+  }
+
+  // 重试同步所有本机未同步记录
+  const retrySync = async (): Promise<boolean> => {
+    const okIds: string[] = []
+    for (const r of pendingLocal) {
+      const ok = await pushCloudRecord({ name: r.nickname, type: r.code, match: r.match, ts: r.ts })
+      if (ok) okIds.push(r.id)
+    }
+    if (okIds.length > 0) markSynced(okIds)
+    void refresh(true)
+    return okIds.length === pendingLocal.length
   }
 
   const retake = () => {
@@ -98,6 +111,8 @@ export default function Home() {
                 saved={false}
                 onSave={saveResult}
                 onRetake={retake}
+                pendingCount={pendingLocal.length}
+                onRetrySync={retrySync}
               />
             )}
           </>
